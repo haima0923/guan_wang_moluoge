@@ -1,0 +1,9 @@
+[Unit]
+Description=Daily backup schedule for Barsan Morocco website
+[Timer]
+OnCalendar=*-*-* 02:30:00 UTC
+RandomizedDelaySec=10m
+Persistent=true
+Unit=barsan-ma-backup.service
+[Install]
+WantedBy=timers.target

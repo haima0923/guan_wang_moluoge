@@ -1,0 +1,6 @@
+data
+LOCAL_ACCESS.md
+.env
+node_modules
+.git
+tests

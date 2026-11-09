@@ -1,0 +1,17 @@
+[Unit]
+Description=Verified backup of Barsan Morocco website
+After=barsan-ma.service
+[Service]
+Type=oneshot
+User=barsan-ma
+Group=barsan-ma
+WorkingDirectory=/srv/barsan-ma/current
+ExecStart=/opt/barsan-ma/runtime/node-v24.22.1-linux-x64/bin/node scripts/backup.mjs
+Environment=DATA_DIR=/srv/barsan-ma/data
+Environment=BACKUP_DIR=/srv/barsan-ma/data/backups
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/barsan-ma/data

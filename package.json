@@ -1,0 +1,20 @@
+{
+  "name": "barsan-freight-website",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "check": "node --check server.mjs && node --check public/app.js && node --check public/admin.js && node --check public/visual-editor.js && node --check public/visual-preview.js && node --check public/article-format.js && node --check article-content.mjs && node --check public/media-library.js && node --check public/article-policy.js && node --check article-html.mjs && node --check media-store.mjs && node --check translation.mjs && node --check content-sync.mjs && node --check public/translation-settings.js && node --check service-content.mjs && node --check public/services.js && node --check company-news.mjs && node --check public/language-settings.js && node --check public/languages.js && node --check request-policy.mjs && node --check release-copy.mjs && node --check scripts/backup.mjs && node --check analytics.mjs && node --check public/site-extras.js && node --check public/analytics-panel.js",
+    "backup": "node scripts/backup.mjs"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "dependencies": {
+    "dompurify": "3.4.17",
+    "mmdb-lib": "3.0.4",
+    "sanitize-html": "2.18.1"
+  }
+}

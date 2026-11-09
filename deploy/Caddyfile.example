@@ -1,0 +1,14 @@
+# Replace this example hostname with the real domain before enabling the site.
+barsan.example.com {
+    @compressible {
+        not path /api/site/events
+    }
+    encode @compressible zstd gzip
+    reverse_proxy 127.0.0.1:3000 {
+        flush_interval -1
+        transport http {
+            dial_timeout 5s
+            response_header_timeout 30m
+        }
+    }
+}

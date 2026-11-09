@@ -1,0 +1,7 @@
+{
+  "source": "https://github.com/sapics/ip-location-db/releases/download/latest/dbip-country.mmdb",
+  "sha256": "6c741fcfda71a297be47c3f3a7fd04feb25c98cb498633b736a053aa95e0ad2f",
+  "sourceUpdatedAt": "2026-11-06T02:06:45Z",
+  "license": "CC BY 4.0",
+  "attribution": "IP geolocation by DB-IP (https://db-ip.com), redistributed by sapics/ip-location-db"
+}

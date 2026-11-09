@@ -1,0 +1,3 @@
+export const ARTICLE_TAGS=['p','br','h2','h3','h4','strong','b','em','i','u','s','ul','ol','li','blockquote','figure','figcaption','img','a','table','thead','tbody','tfoot','tr','th','td','hr','pre','code','div','span','sup','sub'];
+export const ARTICLE_ATTRIBUTES=['src','alt','href','title','colspan','rowspan','scope','dir','loading','decoding','target','rel'];
+export function safeArticleImage(src){return typeof src==='string'&&(/^\/media\/[a-f0-9]{32}\.(png|jpg|webp)$/.test(src)||/^\/assets\/(logo\.png|port\.jpg|hero-ship-poster\.jpg|service-(sea|air|customs|delivery|land|warehouse|ddp)\.jpg)$/.test(src));}
