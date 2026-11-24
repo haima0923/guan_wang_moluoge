@@ -21,7 +21,7 @@ await mkdir(output,{recursive:true});
 const imageCache=new Map();
 async function embeddedImage(path){
  if(!imageCache.has(path)){
-  if(!/^\/assets\/(port|hero-ship-poster|service-(sea|air|customs|warehouse|ddp))\.jpg$/.test(path))throw Error('Unexpected campaign image');
+  if(!/^\/assets\/(port|hero-ship-poster|service-(sea|air|customs|warehouse|ddp))\.jpg$/.test(path)&&!/^\/assets\/articles\/[a-z0-9]+(?:-[a-z0-9]+)*\.jpg$/.test(path))throw Error('Unexpected campaign image');
   const bytes=await readFile(join(project,'public',path));
   imageCache.set(path,'data:image/jpeg;base64,'+bytes.toString('base64'));
  }
@@ -59,10 +59,17 @@ for(const article of campaign.articles){
  const image=await readFile(join(project,'public',article.cover));
  await writeFile(join(output,'封面图片',article.slug+'.jpg'),image);
 }
+const coverGeneration=JSON.parse(await readFile(join(project,'content/marketing/2026-11/cover-prompts.json'),'utf8'));
+await writeFile(join(output,'封面生成说明.txt'),[
+ 'Barsan 五篇文章封面 · 2026-11-24',
+ '使用内置图片生成功能制作。五张均为明亮横版场景示意图，无文字标题，四种语言共用。',
+ 'JPG 文件名与对应 HTML 文章一致。以下为每张图片的完整生成提示词。',
+ ...coverGeneration.covers.map((cover,index)=>`${index+1}. ${campaign.articles.find(article=>article.slug===cover.slug).title.zh}\n文件：封面图片/${cover.slug}.jpg\n生成提示词：\n${cover.prompt}`)
+].join('\n\n')+'\n');
 
 const cards=[];
 for(const [index,article]of campaign.articles.entries()){
- cards.push(`<section class="preview-card"><span class="order">ARTICLE ${String(index+1).padStart(2,'0')} · 运输指南</span><h2>${escape(article.title.zh)}</h2><p>${escape(article.excerpt.zh)}</p><div class="language-links">${Object.entries(languages).map(([language,label])=>`<a href="${language}/${article.slug}.html" ${language==='ary'?'dir="rtl"':''}>${label} ↗</a>`).join('')}</div><div class="share-box"><small>法语转发短文</small><p>${escape(article.share.fr)}</p><small>Darija 转发短文</small><p dir="rtl">${escape(article.share.ary)}</p><small>中文核对</small><p>${escape(article.share.zh)}</p></div></section>`);
+ cards.push(`<section class="preview-card"><span class="order">ARTICLE ${String(index+1).padStart(2,'0')} · 运输指南</span><figure><img src="封面图片/${article.slug}.jpg" alt="${escape(article.title.zh)}" style="height:auto;aspect-ratio:16/9"></figure><h2>${escape(article.title.zh)}</h2><p>${escape(article.excerpt.zh)}</p><div class="language-links">${Object.entries(languages).map(([language,label])=>`<a href="${language}/${article.slug}.html" ${language==='ary'?'dir="rtl"':''}>${label} ↗</a>`).join('')}</div><div class="share-box"><small>法语转发短文</small><p>${escape(article.share.fr)}</p><small>Darija 转发短文</small><p dir="rtl">${escape(article.share.ary)}</p><small>中文核对</small><p>${escape(article.share.zh)}</p></div></section>`);
 }
 const index=`<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Barsan 五篇客户实用指南</title><style>${style}</style></head><body><main><div class="brand">BARSAN · CONTENT COLLECTION</div><h1>给摩洛哥客户的五篇实用指南</h1><p class="intro">中文审阅、法语、Darija 与英语共20个文章文件。点击对应语言即可预览。</p><p class="muted">配图已内嵌，解压后可直接打开。预览样式用于阅读，导入后台后按官网主题显示。每篇下方提供可复制的转发短文，发布后配上对应文章链接。</p><h2>后台发布步骤</h2><ol><li>进入正式后台的「新闻与软文」，点击「新建文章」，选择中文或法语作为编辑语言。</li><li>点击「导入 HTML」，从对应语言文件夹中选择一篇文章。标题、摘要与图片会自动导入，图片会进入素材库。</li><li>网址填写文件名去掉 .html 的部分，分类选择「实用指南」。在素材库选择同篇正文图片作为封面。</li><li>先保存草稿检查，再按计划设置日期并发布。后台会使用你配置的千问同步其他语言，请留意最终页面中的术语与排版。</li><li>发布后复制文章链接，搭配下方相应语言短文转发给客户。</li></ol><p class="muted">准备日期为2026年11月24日。你可以自行选择发布日期和发布顺序。</p><div class="cover-grid">${cards.join('\n')}</div></main></body></html>`;
 await writeFile(join(output,'先看这里.html'),index);
