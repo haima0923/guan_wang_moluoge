@@ -26,9 +26,12 @@ test('Qwen configuration, automatic language sync and atomic publication', async
     if (mode === 'wait') { reached?.();await new Promise(resolve => release = resolve); }
     res.setHeader('Content-Type', 'application/json');
     if (mode === 'unauthorized') { res.writeHead(401);res.end(JSON.stringify({error:apiKey}));return; }
-    const translations = Object.fromEntries(Object.keys(content.targetLanguages).map(l => [l, '[' + l + '] ' + content.text]));
-    if (content.text.includes('BROKEN_RESPONSE')) delete translations.fr;
-    if (content.text.includes('BROKEN_MARKUP')) for (const l of Object.keys(translations)) translations[l] = 'missing formatting';
+    const visibleText = content.textNodes ? content.textNodes.map(node=>node.text).join('\n') : content.text;
+    const translations = Object.fromEntries(Object.keys(content.targetLanguages).map(l => [l, content.textNodes
+      ? Object.fromEntries(content.textNodes.map(node=>[node.id,'['+l+'] '+node.text]))
+      : '[' + l + '] ' + content.text]));
+    if (visibleText.includes('BROKEN_RESPONSE')) delete translations.fr;
+    if (visibleText.includes('BROKEN_MARKUP')) for (const l of Object.keys(translations)) translations[l] = 'missing formatting';
     res.end(JSON.stringify({choices:[{finish_reason:'stop',message:{content:JSON.stringify({translations})}}]}));
   });
   await new Promise(resolve => upstream.listen(0, '127.0.0.1', resolve));

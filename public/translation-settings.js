@@ -16,6 +16,7 @@ export function createTranslationSettings({api, toast, onSaved, onDirty}) {
         <div class="panel-heading"><h2>阿里云千问自动翻译</h2><span class="badge ${config.configured?'green':'gray'}" data-translation-state>${config.configured?'已配置':'待填写 API Key'}</span></div>
         <div class="settings-fields single">
           <p class="translation-description">编辑一种语言，保存时自动翻译并同步英语、法语、摩洛哥 Darija 和中文。官网只显示「前台语言」中开启的语言；后台内容完整保留，中文可一直作为编辑原文。文章标题、摘要、正文和可视化文案均支持同步。</p>
+          <p class="field-hint">长文章会分段翻译，网络短暂中断时自动重试。再次保存同一篇文章时，会复用已完成的分段。</p>
           <label>API Key 所属地域<select name="region" ${config.fromEnvironment?'disabled':''}>
             <option value="beijing" ${region==='beijing'?'selected':''}>华北 2（北京）</option>
             <option value="singapore" ${region==='singapore'?'selected':''}>新加坡</option>

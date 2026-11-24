@@ -51,7 +51,7 @@ function bind(){
   $('#article-form').oninput=()=>{dirty=true;const body=$('[name=body]');$('#body-preview').innerHTML=renderArticleBody(body.value,draft.bodyFormat?.[editLang]||'text');};
   $('#article-form').onsubmit=async e=>{
    e.preventDefault();if(articleBusy)return;collectDraft();const submit=e.submitter;const label=submit.textContent;
-   setArticleBusy(true);submit.textContent=data.translation?.configured?'千问正在翻译并同步…':'正在保存草稿…';$('#editor-error').textContent='';
+   setArticleBusy(true);submit.textContent=data.translation?.configured?'正在分段翻译并同步，请稍候…':'正在保存草稿…';$('#editor-error').textContent='';
    try{const saved=await api('articles'+(editId?'/'+editId:''),{method:editId?'PUT':'POST',body:JSON.stringify({...draft,syncTranslations:true,sourceLanguage:editLang,baseVersion:editId?data.versions?.articles?.[editId]:undefined})});dirty=false;view='articles';toast(saved.translationPending?'草稿已保存，配置千问后可同步翻译':'文章已保存，各语言已同步');await load();}
    catch(err){$('#editor-error').textContent=err.message;submit.textContent=label;}
    finally{setArticleBusy(false);}
