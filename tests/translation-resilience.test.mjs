@@ -77,6 +77,26 @@ test('request timeout retries once and returns a specific safe error', async t =
   } finally {db.close();}
 });
 
+test('plain titles and HTML nodes do not invite invented formatting tokens, while real URLs stay protected', async () => {
+  const seen=[];
+  const {db,service}=fixture(async (url,options)=>{
+    const payload=JSON.parse(options.body),input=inputOf(options);
+    const needsMarkers=/@@BARSAN_/.test(input.text || '');
+    assert.equal(payload.messages[0].content.includes('@@BARSAN_'),needsMarkers);
+    seen.push(needsMarkers);
+    return jsonResponse(input);
+  });
+  try {
+    const title='Même marchandise, deux devis de transport très différents. Que faut-il comparer ?';
+    assert.equal((await service.translate({sourceLanguage:'fr',text:title,maxLength:250})).ary,title);
+    const html='<p>Les frais à comparer</p><img src="/assets/service-sea.jpg">';
+    assert.equal((await service.translate({sourceLanguage:'fr',text:html,format:'html'})).ary,html);
+    const linked='Consultez https://www.portnet.ma/ pour préparer les documents.';
+    assert.equal((await service.translate({sourceLanguage:'fr',text:linked})).ary,linked);
+    assert.ok(seen.includes(true) && seen.includes(false));
+  } finally {db.close();}
+});
+
 test('authentication and quota errors do not retry, while a transient 503 does', async t => {
   const warnings=[];
   t.mock.method(console,'warn',(...parts)=>warnings.push(parts.join(' ')));
