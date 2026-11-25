@@ -59,12 +59,17 @@ for(const article of campaign.articles){
  const image=await readFile(join(project,'public',article.cover));
  await writeFile(join(output,'封面图片',article.slug+'.jpg'),image);
 }
-const coverGeneration=JSON.parse(await readFile(join(project,'content/marketing/2026-11/cover-prompts.json'),'utf8'));
-await writeFile(join(output,'封面生成说明.txt'),[
- 'Barsan 五篇文章封面 · 2026-11-24',
- '使用内置图片生成功能制作。五张均为明亮横版场景示意图，无文字标题，四种语言共用。',
- 'JPG 文件名与对应 HTML 文章一致。以下为每张图片的完整生成提示词。',
- ...coverGeneration.covers.map((cover,index)=>`${index+1}. ${campaign.articles.find(article=>article.slug===cover.slug).title.zh}\n文件：封面图片/${cover.slug}.jpg\n生成提示词：\n${cover.prompt}`)
+const coverSources=JSON.parse(await readFile(join(project,'content/marketing/2026-11/cover-sources.json'),'utf8'));
+await writeFile(join(output,'封面来源.txt'),[
+ `Barsan 五篇文章实拍封面 · ${coverSources.updatedAt}`,
+ '照片裁为横版，用于说明文章涉及的场景。',
+ ...coverSources.covers.map(cover=>[
+  campaign.articles.find(article=>article.slug===cover.slug).title.zh,
+  `文件　封面图片/${cover.slug}.jpg`,
+  `摄影　${cover.photographer} / ${cover.platform}`,
+  `原图　${cover.url}`,
+  `许可　${coverSources.licenses[cover.platform]}`
+ ].join('\n'))
 ].join('\n\n')+'\n');
 
 const cards=[];

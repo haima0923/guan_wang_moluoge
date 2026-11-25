@@ -1,0 +1,39 @@
+{
+  "updatedAt": "2026-11-25",
+  "licenses": {
+    "Pexels": "https://www.pexels.com/license/",
+    "Unsplash": "https://unsplash.com/license"
+  },
+  "covers": [
+    {
+      "slug": "compare-china-morocco-freight-quotes",
+      "photographer": "Olena Kholina",
+      "url": "https://unsplash.com/photos/two-people-reviewing-documents-at-a-table-MhqUBTxQ3Hw",
+      "platform": "Unsplash"
+    },
+    {
+      "slug": "china-morocco-import-cost-checklist",
+      "photographer": "Kaboompics",
+      "url": "https://www.pexels.com/photo/bookkeeper-writing-down-on-paper-while-using-calculator-4476375/",
+      "platform": "Pexels"
+    },
+    {
+      "slug": "yiwu-guangzhou-consolidation-to-morocco",
+      "photographer": "Tiger Lily",
+      "url": "https://www.pexels.com/photo/warehouse-workers-carrying-boxes-4487361/",
+      "platform": "Pexels"
+    },
+    {
+      "slug": "morocco-door-delivery-eight-questions",
+      "photographer": "Kampus Production",
+      "url": "https://www.pexels.com/photo/a-woman-receiving-a-package-8931691/",
+      "platform": "Pexels"
+    },
+    {
+      "slug": "china-supplier-payment-seven-checks",
+      "photographer": "Hans Westbeek",
+      "url": "https://unsplash.com/photos/hands-using-a-digital-caliper-to-measure-metal-part-_luiFaaZU6k",
+      "platform": "Unsplash"
+    }
+  ]
+}
