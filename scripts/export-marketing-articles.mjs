@@ -1,10 +1,17 @@
 import {mkdir,readFile,writeFile} from 'node:fs/promises';
 import {resolve,join} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import oceanCampaign from '../content/marketing/2026-11-ocean/articles.mjs';
 
 const project=fileURLToPath(new URL('../',import.meta.url));
-const campaign=JSON.parse(await readFile(join(project,'content/marketing/2026-11/articles.json'),'utf8'));
-const output=resolve(process.argv[2]||join(project,'../barsan-articles-2026-11-24'));
+const ocean=process.argv[3]==='ocean';
+if (process.argv[3] && !ocean) throw Error('Unknown campaign: '+process.argv[3]);
+const campaignDir=join(project,'content/marketing',ocean?'2026-11-ocean':'2026-11');
+const campaign=ocean?oceanCampaign:JSON.parse(await readFile(join(campaignDir,'articles.json'),'utf8'));
+const output=resolve(process.argv[2]||join(project,`../barsan-articles-${campaign.preparedAt}`));
+const category=ocean?'海运资讯':'实用指南';
+const collection=ocean?'中国到摩洛哥 · 五篇海运咨询指南':'给摩洛哥客户的五篇实用指南';
+const preparedDate=new Intl.DateTimeFormat('zh-CN',{dateStyle:'long',timeZone:'UTC'}).format(new Date(campaign.preparedAt));
 const languages={zh:'中文审阅版',fr:'Français',ary:'الدارجة المغربية',en:'English'};
 const escape=value=>String(value).replace(/[&<>"']/g,character=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character]));
 const style=`
@@ -59,7 +66,7 @@ for(const article of campaign.articles){
  const image=await readFile(join(project,'public',article.cover));
  await writeFile(join(output,'封面图片',article.slug+'.jpg'),image);
 }
-const coverSources=JSON.parse(await readFile(join(project,'content/marketing/2026-11/cover-sources.json'),'utf8'));
+const coverSources=JSON.parse(await readFile(join(campaignDir,'cover-sources.json'),'utf8'));
 await writeFile(join(output,'封面来源.txt'),[
  `Barsan 五篇文章实拍封面 · ${coverSources.updatedAt}`,
  '照片裁为横版，用于说明文章涉及的场景。',
@@ -74,9 +81,9 @@ await writeFile(join(output,'封面来源.txt'),[
 
 const cards=[];
 for(const [index,article]of campaign.articles.entries()){
- cards.push(`<section class="preview-card"><span class="order">ARTICLE ${String(index+1).padStart(2,'0')} · 运输指南</span><figure><img src="封面图片/${article.slug}.jpg" alt="${escape(article.title.zh)}" style="height:auto;aspect-ratio:16/9"></figure><h2>${escape(article.title.zh)}</h2><p>${escape(article.excerpt.zh)}</p><div class="language-links">${Object.entries(languages).map(([language,label])=>`<a href="${language}/${article.slug}.html" ${language==='ary'?'dir="rtl"':''}>${label} ↗</a>`).join('')}</div><div class="share-box"><small>法语转发短文</small><p>${escape(article.share.fr)}</p><small>Darija 转发短文</small><p dir="rtl">${escape(article.share.ary)}</p><small>中文核对</small><p>${escape(article.share.zh)}</p></div></section>`);
+ cards.push(`<section class="preview-card"><span class="order">ARTICLE ${String(index+1).padStart(2,'0')} · ${escape(category)}</span><figure><img src="封面图片/${article.slug}.jpg" alt="${escape(article.title.zh)}" style="height:auto;aspect-ratio:16/9"></figure><h2>${escape(article.title.zh)}</h2><p>${escape(article.excerpt.zh)}</p><div class="language-links">${Object.entries(languages).map(([language,label])=>`<a href="${language}/${article.slug}.html" ${language==='ary'?'dir="rtl"':''}>${label} ↗</a>`).join('')}</div><div class="share-box"><small>法语转发短文</small><p>${escape(article.share.fr)}</p><small>Darija 转发短文</small><p dir="rtl">${escape(article.share.ary)}</p><small>中文核对</small><p>${escape(article.share.zh)}</p></div></section>`);
 }
-const index=`<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Barsan 五篇客户实用指南</title><style>${style}</style></head><body><main><div class="brand">BARSAN · CONTENT COLLECTION</div><h1>给摩洛哥客户的五篇实用指南</h1><p class="intro">中文审阅、法语、Darija 与英语共20个文章文件。点击对应语言即可预览。</p><p class="muted">配图已内嵌，解压后可直接打开。预览样式用于阅读，导入后台后按官网主题显示。每篇下方提供可复制的转发短文，发布后配上对应文章链接。</p><h2>后台发布步骤</h2><ol><li>进入正式后台的「新闻与软文」，点击「新建文章」，选择中文或法语作为编辑语言。</li><li>点击「导入 HTML」，从对应语言文件夹中选择一篇文章。标题、摘要与图片会自动导入，图片会进入素材库。</li><li>网址填写文件名去掉 .html 的部分，分类选择「实用指南」。在素材库选择同篇正文图片作为封面。</li><li>先保存草稿检查，再按计划设置日期并发布。后台会使用你配置的千问同步其他语言，请留意最终页面中的术语与排版。</li><li>发布后复制文章链接，搭配下方相应语言短文转发给客户。</li></ol><p class="muted">准备日期为2026年11月24日。你可以自行选择发布日期和发布顺序。</p><div class="cover-grid">${cards.join('\n')}</div></main></body></html>`;
+const index=`<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(collection)} | Barsan</title><style>${style}</style></head><body><main><div class="brand">BARSAN · CONTENT COLLECTION</div><h1>${escape(collection)}</h1><p class="intro">中文审阅、法语、Darija 与英语共20个文章文件。点击对应语言即可预览。</p><p class="muted">配图已内嵌，解压后可直接打开。预览样式用于阅读，导入后台后按官网主题显示。每篇下方提供可复制的转发短文，发布后配上对应文章链接。</p><h2>后台发布步骤</h2><ol><li>进入正式后台的「新闻与软文」，点击「新建文章」，选择中文或法语作为编辑语言。</li><li>点击「导入 HTML」，从对应语言文件夹中选择一篇文章。标题、摘要与图片会自动导入，图片会进入素材库。</li><li>网址填写文件名去掉 .html 的部分，分类选择「${escape(category)}」。在素材库选择同篇正文图片作为封面。</li><li>先保存草稿检查，再按计划设置日期并发布。后台会使用你配置的千问同步其他语言，请留意最终页面中的术语与排版。</li><li>发布后复制文章链接，搭配下方相应语言短文转发给客户。</li></ol><p class="muted">准备日期为${escape(preparedDate)}。你可以自行选择发布日期和发布顺序。</p><div class="cover-grid">${cards.join('\n')}</div></main></body></html>`;
 await writeFile(join(output,'先看这里.html'),index);
 
 const sharing=[];
@@ -86,5 +93,5 @@ for(const [index,article]of campaign.articles.entries()){
  sharing.push('发布后在短文后附上对应的正式文章链接。\n\n');
 }
 await writeFile(join(output,'转发短文.txt'),sharing.join('\n'));
-await writeFile(join(output,'发布说明.txt'),`Barsan 五篇客户实用指南\n\n先打开“先看这里.html”查看五篇文章与转发短文。\n\nzh 为中文审阅稿，fr 为法语稿，ary 为摩洛哥Darija稿，en 为英语稿。每个文件均有完整标题、摘要、正文和内嵌图片。\n\n后台入口 https://ma.barsan.com.cn/admin\n选择“新闻与软文” → “新建文章” → 选择编辑语言 → “导入HTML”。\n导入单个HTML文件后，网址填写文件名去掉.html的部分，分类选“实用指南”。从素材库选对应图片作为封面，或上传“封面图片”文件夹中的同名图片，检查草稿后再发布。\n后台按现有千问配置同步其他语言。四语成稿方便提前审阅，实际保存后的译文以后台结果为准。\n\n所有配图均为场景示意。客户案例和市场价格未用于这些文章。准备日期 2026-11-24，发布日期由你设置。\n`);
+await writeFile(join(output,'发布说明.txt'),`Barsan · ${collection}\n\n先打开“先看这里.html”查看五篇文章与转发短文。\n\nzh 为中文审阅稿，fr 为法语稿，ary 为摩洛哥Darija稿，en 为英语稿。每个文件均有完整标题、摘要、正文和内嵌图片。\n\n后台入口 https://ma.barsan.com.cn/admin\n选择“新闻与软文” → “新建文章” → 选择编辑语言 → “导入HTML”。\n导入单个HTML文件后，网址填写文件名去掉.html的部分，分类选“${category}”。从素材库选对应图片作为封面，或上传“封面图片”文件夹中的同名图片，检查草稿后再发布。\n后台按现有千问配置同步其他语言。四语成稿方便提前审阅，实际保存后的译文以后台结果为准。\n\n所有配图均为场景示意。客户案例和市场价格未用于这些文章。准备日期 ${campaign.preparedAt}，发布日期由你设置。\n`);
 console.log(`Exported ${campaign.articles.length} articles in ${campaign.languages.length} languages to ${output}`);
